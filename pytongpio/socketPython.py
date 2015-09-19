@@ -11,7 +11,6 @@ import sys
 import re
 import signal
 
-
 def myexcepthook(exctype, value, traceback):
     if exctype == KeyboardInterrupt:
         socket.close()
