@@ -29,12 +29,11 @@ def signal_handler(signal, frame):
 
 
 signal.signal(signal.SIGINT, signal_handler)
-
 socket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
 address = ('localhost', 5432)  # Create an address tuple
 socket.bind(address)
-
 rr = rrb.RRB2(revision=2)
+
 while 1:  # This will loop forever
     socket.listen(1)
     print "Someone has connected"
@@ -63,7 +62,7 @@ while 1:  # This will loop forever
                 value = float(matchObj.group(1))
                 print "value : ", value
                 print "SWITCH ", rr.sw1_closed()
-                rr.set_motors(value, 0, value, 0)
+                #### rr.set_motors(value, 0, value, 0)
             # rr.set_motors(0, 0, float(matchObj.group(1)), 0)
 
             ### LED ###
