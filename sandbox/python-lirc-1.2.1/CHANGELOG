@@ -1,0 +1,17 @@
+Change Log
+==========
+
+v1.2.1
+------
+- Fixed `set_blocking` bug (issue #2).
+- Added nonblocking tests.
+- Added python-dev and python3-dev to README.
+
+v1.2.0
+------
+- Structured for Debian packaging.
+
+v1.1
+----
+- Tidied up project structure.
+- init now tries to use config at ~/.lircrc and then /etc/lirc/lircrc.
