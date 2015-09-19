@@ -59,5 +59,5 @@ setInterval(function(){
     socket.write(value);
     v = 1 - v;
     socket.write("LED-"+v);
-},175);
+},250);
 

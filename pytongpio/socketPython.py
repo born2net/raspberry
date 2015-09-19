@@ -38,7 +38,7 @@ while 1 : # This will loop forever
 	connection, addrress = socket.accept() # The program blocks here
         print "000000"
 	while 1 : # While somebody is connected
-                print "AAAAAAAAAAAAAAAAAA"
+                print "ABC"
 		if rr.sw1_closed():
                         print "exiting bye bye..."
                         connection.send("Exiting")
@@ -60,7 +60,7 @@ while 1 : # This will loop forever
                                 value = float(matchObj.group(1))
 				print "value : ", value
                                 print "SWITCH ", rr.sw1_closed()
-                     	   	#### rr.set_motors(value, 0, value, 0)
+                     	   	  rr.set_motors(value, 0, value, 0)
                      	   	# rr.set_motors(0, 0, float(matchObj.group(1)), 0)
 
                         ### LED ###
