@@ -50,7 +50,7 @@ setInterval(function () {
 
     // console.log('x ' + x + ' y ' + y);
 
-    CommandDifferentialDrive3(x, y);
+    CommandDifferentialDrive2(x, y);
 }, 200);
 
 
@@ -95,7 +95,12 @@ var CommandDifferentialDrive3 = function (x, y) {
     if (leftMotor == 0 && rightMotor == 1 && moveY == 0)
         direction = "hardRight";
 
-    console.log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor);
+    if (direction.indexOf('hard')>-1){
+        console.log('direction ' + direction);
+    } else {
+        console.log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor);
+    }
+
 };
 
 
@@ -111,31 +116,35 @@ var CommandDifferentialDrive2 = function (x, y) {
         if (x < 505) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
-            leftMotor = 1 - perc(leftMotor, reducePerc);
+            leftMotor = leftMotor - perc(leftMotor, reducePerc);
         }
+
         // right
         if (x > 515) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
-            rightMotor = 1 + perc(rightMotor, reducePerc);
+            rightMotor = rightMotor + perc(rightMotor, reducePerc);
         }
+
     }
 
     // back
+
     if (moveY < 0) {
         direction = 'back';
         if (x < 505) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
-            leftMotor = 1 + perc(leftMotor, reducePerc);
+            leftMotor = Math.abs(leftMotor) + perc(leftMotor, reducePerc);
         }
         // right
         if (x > 515) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
-            rightMotor = 1 - perc(rightMotor, reducePerc);
+            rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
         }
     }
+
     console.log('direction ' + direction + ' leftMotor ' + Math.abs(fixDec(leftMotor)) + ' rightMotor ' + Math.abs(fixDec(rightMotor)));
 };
 
