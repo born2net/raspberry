@@ -95,7 +95,7 @@ var CommandDifferentialDrive3 = function (x, y) {
     if (leftMotor == 0 && rightMotor == 1 && moveY == 0)
         direction = "hardRight";
 
-    if (direction.indexOf('hard')>-1){
+    if (direction.indexOf('hard') > -1) {
         console.log('direction ' + direction);
     } else {
         console.log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor);
@@ -103,11 +103,25 @@ var CommandDifferentialDrive3 = function (x, y) {
 
 };
 
+function runMotor(leftMotor, rightMotor, direction) {
+    console.log('direction ' + direction + ' leftMotor ' + Math.abs(fixDec(leftMotor)) + ' rightMotor ' + Math.abs(fixDec(rightMotor)));
+}
 
 var CommandDifferentialDrive2 = function (x, y) {
     var moveY, leftMotor, rightMotor;
     var direction = 'none';
     moveY = leftMotor = rightMotor = (yBase - y) / yBase;
+
+    if (y > 500 && y < 520) {
+        if (x < 500) {
+            runMotor(1, 1, 'swapLeft');
+            return;
+        }
+        if (x > 520) {
+            runMotor(1, 1, 'swapRight');
+            return
+        }
+    }
 
     // fwd
     if (moveY > 0) {
@@ -129,7 +143,6 @@ var CommandDifferentialDrive2 = function (x, y) {
     }
 
     // back
-
     if (moveY < 0) {
         direction = 'back';
         if (x < 505) {
@@ -145,7 +158,8 @@ var CommandDifferentialDrive2 = function (x, y) {
         }
     }
 
-    console.log('direction ' + direction + ' leftMotor ' + Math.abs(fixDec(leftMotor)) + ' rightMotor ' + Math.abs(fixDec(rightMotor)));
+    runMotor(leftMotor, rightMotor, direction);
+
 };
 
 
