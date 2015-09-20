@@ -61,26 +61,29 @@ function fixDec(val) {
     return parseFloat(val).toFixed(2)
 }
 
+// do your motor action here
 function runMotor(leftMotor, rightMotor, direction) {
     console.log('direction ' + direction + ' leftMotor ' + Math.abs(fixDec(leftMotor)) + ' rightMotor ' + Math.abs(fixDec(rightMotor)));
 }
 
-var xBase = 510;
-var yBase = 516;
-
+var X_CENTER = 510;
+var Y_CENTER = 516;
+var THRESHOLD_LOW = 500;
+var THRESHOLD_HIGH = 520;
 
 var CommandDifferentialDrive2 = function (x, y) {
-    var moveY, leftMotor, rightMotor;
+    var moveY, leftMotor, rightMotor, reduceX, reducePerc;
     var direction = 'none';
-    moveY = leftMotor = rightMotor = (yBase - y) / yBase;
+
+    moveY = leftMotor = rightMotor = (Y_CENTER - y) / Y_CENTER;
 
     // sharp turn
-    if (y > 500 && y < 520) {
-        if (x < 500) {
+    if (y > THRESHOLD_LOW && y < THRESHOLD_HIGH) {
+        if (x < THRESHOLD_LOW) {
             runMotor(1, 1, 'sharpLeft');
             return;
         }
-        if (x > 520) {
+        if (x > THRESHOLD_HIGH) {
             runMotor(1, 1, 'sharpRight');
             return
         }
@@ -90,15 +93,15 @@ var CommandDifferentialDrive2 = function (x, y) {
     if (moveY > 0) {
         direction = 'fwd';
         // left
-        if (x < 505) {
-            var reduceX = xBase - x;
-            var reducePerc = (reduceX / xBase) * 100;
+        if (x < THRESHOLD_LOW) {
+            reduceX = X_CENTER - x;
+            reducePerc = (reduceX / X_CENTER) * 100;
             leftMotor = leftMotor - perc(leftMotor, reducePerc);
         }
         // right
-        if (x > 515) {
-            var reduceX = xBase - x;
-            var reducePerc = (reduceX / xBase) * 100;
+        if (x > THRESHOLD_HIGH) {
+            reduceX = X_CENTER - x;
+            reducePerc = (reduceX / X_CENTER) * 100;
             rightMotor = rightMotor + perc(rightMotor, reducePerc);
         }
     }
@@ -107,15 +110,15 @@ var CommandDifferentialDrive2 = function (x, y) {
     if (moveY < 0) {
         direction = 'back';
         // left
-        if (x < 505) {
-            var reduceX = xBase - x;
-            var reducePerc = (reduceX / xBase) * 100;
+        if (x < THRESHOLD_LOW) {
+            reduceX = X_CENTER - x;
+            reducePerc = (reduceX / X_CENTER) * 100;
             leftMotor = Math.abs(leftMotor) + perc(leftMotor, reducePerc);
         }
         // right
-        if (x > 515) {
-            var reduceX = xBase - x;
-            var reducePerc = (reduceX / xBase) * 100;
+        if (x > THRESHOLD_HIGH) {
+            reduceX = X_CENTER - x;
+            reducePerc = (reduceX / X_CENTER) * 100;
             rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
         }
     }
