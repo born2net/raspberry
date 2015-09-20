@@ -61,64 +61,27 @@ function fixDec(val) {
     return parseFloat(val).toFixed(2)
 }
 
-var xBase = 510;
-var yBase = 516;
-
-var CommandDifferentialDrive3 = function (x, y) {
-    var moveY, leftMotor, rightMotor, reducePerc;
-    var direction = 'none';
-    moveY = leftMotor = rightMotor = (yBase - y) / yBase;
-
-    if (moveY > 0) {
-        direction = 'frwd'
-    } else if (moveY < 0) {
-        direction = 'back'
-    }
-
-    // left fwd
-    if (x < 505) {
-        reducePerc = ((xBase - x) / xBase) * 100;
-        leftMotor = direction == 'frwd' ? 1 - perc(leftMotor, reducePerc) : 1 + perc(leftMotor, reducePerc);
-    }
-    // right fwd
-    if (x > 515) {
-        reducePerc = ((xBase - x) / xBase) * 100;
-        rightMotor = direction == 'frwd' ? 1 + perc(leftMotor, reducePerc) : 1 - perc(leftMotor, reducePerc);
-    }
-
-    leftMotor = Math.abs(fixDec(leftMotor));
-    rightMotor = Math.abs(fixDec(rightMotor));
-
-    // hard right or left turns
-    if (leftMotor == 1 && rightMotor == 0 && moveY == 0)
-        direction = "hardLeft";
-    if (leftMotor == 0 && rightMotor == 1 && moveY == 0)
-        direction = "hardRight";
-
-    if (direction.indexOf('hard') > -1) {
-        console.log('direction ' + direction);
-    } else {
-        console.log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor);
-    }
-
-};
-
 function runMotor(leftMotor, rightMotor, direction) {
     console.log('direction ' + direction + ' leftMotor ' + Math.abs(fixDec(leftMotor)) + ' rightMotor ' + Math.abs(fixDec(rightMotor)));
 }
+
+var xBase = 510;
+var yBase = 516;
+
 
 var CommandDifferentialDrive2 = function (x, y) {
     var moveY, leftMotor, rightMotor;
     var direction = 'none';
     moveY = leftMotor = rightMotor = (yBase - y) / yBase;
 
+    // sharp turn
     if (y > 500 && y < 520) {
         if (x < 500) {
-            runMotor(1, 1, 'swapLeft');
+            runMotor(1, 1, 'sharpLeft');
             return;
         }
         if (x > 520) {
-            runMotor(1, 1, 'swapRight');
+            runMotor(1, 1, 'sharpRight');
             return
         }
     }
@@ -132,19 +95,18 @@ var CommandDifferentialDrive2 = function (x, y) {
             var reducePerc = (reduceX / xBase) * 100;
             leftMotor = leftMotor - perc(leftMotor, reducePerc);
         }
-
         // right
         if (x > 515) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
             rightMotor = rightMotor + perc(rightMotor, reducePerc);
         }
-
     }
 
     // back
     if (moveY < 0) {
         direction = 'back';
+        // left
         if (x < 505) {
             var reduceX = xBase - x;
             var reducePerc = (reduceX / xBase) * 100;
@@ -157,9 +119,7 @@ var CommandDifferentialDrive2 = function (x, y) {
             rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
         }
     }
-
     runMotor(leftMotor, rightMotor, direction);
-
 };
 
 
