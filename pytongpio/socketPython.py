@@ -36,12 +36,11 @@ rr = rrb.RRB2(revision=2)
 
 while 1:  # This will loop forever
     socket.listen(1)
-    print "Someone has connected"
+    print "Robot has connected"
     connection, addrress = socket.accept()  # The program blocks here
-    print "000000"
     while 1:  # While somebody is connected
         if rr.sw1_closed():
-            print "exiting bye bye..."
+            print "bye Robot"
             connection.send("Exiting")
             socket.close()
             sys.exit()
@@ -84,7 +83,6 @@ while 1:  # This will loop forever
                 print "SWITCH ", rr.sw1_closed()
                 # print "Distance ", rr.get_distance()
                 rr.set_motors(motorLeft, directionLeft, motorRight, directionRight)
-            # rr.set_motors(0, 0, float(matchObj.group(1)), 0)
 
             ### LED ###
             matchObj = re.match('LED-([0-9]+)$', data)

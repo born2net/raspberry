@@ -1,15 +1,18 @@
 #!/usr/local/bin/node
 
-log('remember to run /root/pytongpio/socketPython.py');
-
+var Joystick = require("joystick-logitech-f710");
 var net = require('net');
 
 var HOST = 'localhost';
 var PORT = 5432;
 var SERVER_CONNECT = 1;
-var DEBUG = 0;
-
+var MAX_JOYSTICK = 1017;
+var DEBUG = 3;
 var skip = 0;
+var joyX = 0;
+var joyY = 0;
+
+console.log('\n\nremember to run /root/pytongpio/socketPython.py\n\n');
 
 /////////////////////////////////
 // TCP Socket
@@ -30,127 +33,111 @@ if (SERVER_CONNECT) {
         log('Connection closed');
     });
 
-// this handler will be called when the process receives the sigint signal,
-// like when you press ctrl + c
+// catch cont-c
 //process.on('SIGINT', function(){
 //    socket.destroy();
 //    process.exit();
 //});
 }
 
-function log(msg, level) {
-    if (DEBUG >= level) {
-        console.log(msg);
-    }
-}
 
-var Joystick = require("joystick-logitech-f710");
-
-var joyX = 0;
-var joyY = 0;
-
-/** Setting for when using Raspberry pi potentiometer joystick **/
+/** The following setting were tested using raw potentiometer (adjustable resistor knobs) as joystick **/
 //var X_CENTER = 510;
 //var Y_CENTER = 516;
 //var THRESHOLD_LOW = 500;
 //var THRESHOLD_HIGH = 520;
 
-
-/** Setting for when using Logitech 710 joystick **/
+/** The following setting were tested using the Logitech 710 joystick **/
 var X_CENTER = 510;
 var Y_CENTER = 516;
 var THRESHOLD_LOW = 490;
 var THRESHOLD_HIGH = 540;
 
-
 Joystick.create("/dev/input/js0", function (err, joystick) {
-    if (err) {
+    if (err)
         throw err;
-    }
 
-    joystick.setMaximumAxesPosition(1017);
+    joystick.setMaximumAxesPosition(MAX_JOYSTICK);
+
     joystick.on("button:a:press", function () {
-        log("a1",3);
+        log("a1", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2",3);
+        log("a2", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2",3);
+        log("a2", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2",3);
+        log("a2", 3);
     });
 
     joystick.on("stick:1:vertical:up", function (position) {
-        log("1: " + position,3);
+        log("1: " + position, 3);
     });
     joystick.on("stick:1:vertical:down", function (position) {
-        log("2: " + position,3);
+        log("2: " + position, 3);
     });
     joystick.on("stick:1:vertical:zero", function (position) {
-        log("3: " + position,3);
+        log("3: " + position, 3);
     });
 
     joystick.on("stick:2:vertical:up", function (position) {
-        log("7: " + position,3);
+        log("7: " + position, 3);
     });
     joystick.on("stick:2:vertical:down", function (position) {
-        log("8: " + position,3);
+        log("8: " + position, 3);
     });
     joystick.on("stick:2:vertical:zero", function (position) {
-        log("9: " + position,3);
+        log("9: " + position, 3);
     });
     joystick.on("stick:2:horizontal:right", function (position) {
-        log("10: " + position,3);
+        log("10: " + position, 3);
     });
     joystick.on("stick:2:horizontal:left", function (position) {
-        log("11: " + position,3);
+        log("11: " + position, 3);
     });
     joystick.on("stick:2:horizontal:zero", function (position) {
-        log("12: " + position,3);
+        log("12: " + position, 3);
     });
 
     joystick.on("stick:3:horizontal:right", function (position) {
-        log("16: " + position,3);
+        log("16: " + position, 3);
     });
     joystick.on("stick:3:horizontal:left", function (position) {
-        log("17: " + position,3);
+        log("17: " + position, 3);
     });
     joystick.on("stick:3:horizontal:zero", function (position) {
-        log("18: " + position,3);
+        log("18: " + position, 3);
     });
 
 
-    // MOTORS DRIVE //
+    /** Drive the motors using H-Bridge **/
+
     joystick.on("stick:1:horizontal:right", function (position) {
         joyY = Math.abs((position / 2) + Y_CENTER);
-        log("STICK DOWN: " + position + ' joyY: ' + joyY,3);
+        log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
 
     });
     joystick.on("stick:1:horizontal:left", function (position) {
         joyY = Math.abs((position / 2) - Y_CENTER);
-        log("STICK UP: " + position + ' joyY: ' + joyY,3);
+        log("STICK UP: " + position + ' joyY: ' + joyY, 3);
 
     });
     joystick.on("stick:3:vertical:up", function (position) {
         joyX = Math.abs((position / 2) - X_CENTER);
-        log("STICK LEFT: " + position + ' joyX: ' + joyX,3);
+        log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
 
     });
     joystick.on("stick:3:vertical:down", function (position) {
         joyX = Math.abs((position / 2) + X_CENTER);
-        log("STICK RIGHT: " + position + ' joyX: ' + joyX,3);
+        log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
     });
     joystick.on("stick:3:vertical:zero", function (position) {
-        log("A: " + position,3);
-        //joyX = X_CENTER;
-        //joyY = Y_CENTER;
+        log("A: " + position, 3);
     });
     joystick.on("stick:1:horizontal:zero", function (position) {
-        log("B: " + position,3);
-        //joyX = X_CENTER;
-        //joyY = Y_CENTER;
+        log("B: " + position, 3);
     });
     joystick.on("button:lb:press", function () {
         runMotor(1, 1, 'sharpLeft');
@@ -169,25 +156,23 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
         runMotor(0, 0, 'fwd');
     });
     joystick.on("button:ls:press", function () {
-        log("stop",2);
+        log("stop", 2);
         skip = 0;
         runMotor(0, 0, 'fwd');
     });
     joystick.on("button:ls:release", function () {
-        log("stop",2);
+        log("stop", 2);
         skip = 0;
         runMotor(0, 0, 'fwd');
     });
-
-
 });
 
 
 setInterval(function () {
-    log('x ' + joyX + ' y ' + joyY,1);
+    log('x ' + joyX + ' y ' + joyY, 1);
     if (skip)
         return;
-    CommandDifferentialDrive2(joyX, joyY);
+    CommandDifferentialDrive(joyX, joyY);
 }, 200);
 
 
@@ -198,43 +183,55 @@ function fixDec(val) {
     return parseFloat(val).toFixed(2)
 }
 
-// do your motor action here
+/**
+ Send motor run to remote server
+ @method runMotor
+ @param {Number} leftMotor
+ @param {Number} rightMotor
+ @param {direction} String
+ **/
 function runMotor(leftMotor, rightMotor, direction) {
     leftMotor = Math.abs(fixDec(leftMotor));
     rightMotor = Math.abs(fixDec(rightMotor));
-    log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor,1);
+    log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor, 1);
     var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
     if (SERVER_CONNECT)
         socket.write(value);
 }
 
-
-var CommandDifferentialDrive2 = function (x, y) {
+/**
+ Calc the joystick x y coords and translate to linear motor differential movement
+ @method CommandDifferentialDrive
+ @param {Number} x
+ @param {Number} y
+ **/
+var CommandDifferentialDrive = function (x, y) {
     var moveY, leftMotor, rightMotor, reduceX, reducePerc;
     var direction = 'none';
 
     moveY = leftMotor = rightMotor = (Y_CENTER - y) / Y_CENTER;
 
-    log('ZZZ ' + rightMotor + ' ' + leftMotor,3);
+    log(rightMotor + ' -- ' + leftMotor, 3);
 
     if (rightMotor == 1 && leftMotor == 1)
         return;
 
-    // sharp turn: enable following lines if you wish to mix to stick sharp turns on extrem left and right stick movements
-    /*
-     if (y > THRESHOLD_LOW && y < THRESHOLD_HIGH) {
-     if (x < THRESHOLD_LOW) {
-     runMotor(1, 1, 'sharpLeft');
-     return;
-     }
-     if (x > THRESHOLD_HIGH) {
-     runMotor(1, 1, 'sharpRight');
-     return
-     }
-     }
-     */
+    /** sharp turn: enable following lines
+     if you wish to mix to stick sharp
+     extreme left and right to allow sharp turns via
+     reverse differential: untested **/
+    // if (y > THRESHOLD_LOW && y < THRESHOLD_HIGH) {
+    //    if (x < THRESHOLD_LOW) {
+    //        runMotor(1, 1, 'sharpLeft');
+    //        return;
+    //    }
+    //    if (x > THRESHOLD_HIGH) {
+    //        runMotor(1, 1, 'sharpRight');
+    //        return
+    //    }
+    // }
 
-    // fwd
+    /** FORWARD **/
     if (moveY > 0) {
         direction = 'fwd';
         // left
@@ -251,16 +248,17 @@ var CommandDifferentialDrive2 = function (x, y) {
         }
     }
 
-    // back
+    /** BACK **/
     if (moveY < 0) {
         direction = 'back';
-        // left
+
+        /** LEFT **/
         if (x < THRESHOLD_LOW) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
             leftMotor = Math.abs(leftMotor) + perc(leftMotor, reducePerc);
         }
-        // right
+        /** RIGHT **/
         if (x > THRESHOLD_HIGH) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
@@ -270,3 +268,9 @@ var CommandDifferentialDrive2 = function (x, y) {
     runMotor(leftMotor, rightMotor, direction);
 };
 
+
+function log(msg, level) {
+    if (DEBUG >= level) {
+        console.log(msg);
+    }
+}
