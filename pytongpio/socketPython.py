@@ -53,16 +53,37 @@ while 1:  # This will loop forever
         else:
 
             ### MOTOR ###
-            matchObj = re.match('MOTOR-([0-9].*)$', data)
+            ###matchObj = re.match('MOTOR-([0-9].*)$', data)
+            matchObj = re.match('MOTOR-([0-9].*?)(-)([0-9].*)(-)(.*)', data)
             if matchObj:
-                # print "matchObj.group() : ", matchObj.group()
-                # print "matchObj.group(1) : ", matchObj.group(1)
-                # print "matchObj.group(2) : ", matchObj.group(2)
-                value = float(matchObj.group(1))
-                print "value : ", value
+                print "matchObj.group() : ", matchObj.group()
+                print "matchObj.group(1) : ", matchObj.group(1)
+                print "matchObj.group(2) : ", matchObj.group(2)
+                print "matchObj.group(3) : ", matchObj.group(3)
+                print "matchObj.group(4) : ", matchObj.group(4)
+                print "matchObj.group(5) : ", matchObj.group(5)
+                motorLeft = float(matchObj.group(1))
+                motorRight = float(matchObj.group(3))
+                direction = matchObj.group(5)
+                directionLeft = matchObj.group(5)
+                directionRight = matchObj.group(5)
+                if direction == 'fwd':
+                    directionLeft = 1
+                    directionRight = 1
+                elif direction == 'back':
+                    directionLeft = 0
+                    directionRight = 0
+                elif direction == 'sharpLeft':
+                    directionLeft = 1
+                    directionRight = 0
+                elif direction == 'sharpRight':
+                    directionLeft = 0
+                    directionRight = 1
+                elif direction == 'none':
+                    continue
                 print "SWITCH ", rr.sw1_closed()
                 # print "Distance ", rr.get_distance()
-                #### rr.set_motors(value, 0, value, 0)
+                rr.set_motors(motorLeft, directionLeft, motorRight, directionRight)
             # rr.set_motors(0, 0, float(matchObj.group(1)), 0)
 
             ### LED ###
