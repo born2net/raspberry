@@ -7,8 +7,8 @@ var HOST = 'localhost';
 var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
-var MODE = 'XINPUT'; // DIGITAL or DIRECT switch button
-var DEBUG = 1;
+var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
+var DEBUG = 3;
 var skip = 0;
 var joyX = 0;
 var joyY = 0;
@@ -115,57 +115,141 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
 
     /** Drive the motors using H-Bridge **/
 
-    joystick.on("stick:1:horizontal:right", function (position) {
-        joyY = Math.abs((position / 2) + Y_CENTER);
-        log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
+    if (MODE=='XINPUT'){
 
-    });
-    joystick.on("stick:1:horizontal:left", function (position) {
-        joyY = Math.abs((position / 2) - Y_CENTER);
-        log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+        // XINPUT via switch on Logitech remote, more precise but cross stick does not work
 
-    });
-    joystick.on("stick:3:vertical:up", function (position) {
-        joyX = Math.abs((position / 2) - X_CENTER);
-        log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+        joystick.on("stick:1:horizontal:right", function (position) {
+            joyY = Math.abs((position / 2) + Y_CENTER);
+            log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
 
-    });
-    joystick.on("stick:3:vertical:down", function (position) {
-        joyX = Math.abs((position / 2) + X_CENTER);
-        log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
-    });
-    joystick.on("stick:3:vertical:zero", function (position) {
-        log("A: " + position, 3);
-    });
-    joystick.on("stick:1:horizontal:zero", function (position) {
-        log("B: " + position, 3);
-    });
-    joystick.on("button:lb:press", function () {
-        runMotor(1, 1, 'sharpLeft');
-        skip = 1;
-    });
-    joystick.on("button:lb:release", function () {
-        skip = 0;
-        runMotor(0, 0, 'fwd');
-    });
-    joystick.on("button:rb:press", function () {
-        runMotor(1, 1, 'sharpRight');
-        skip = 1;
-    });
-    joystick.on("button:rb:release", function () {
-        skip = 0;
-        runMotor(0, 0, 'fwd');
-    });
-    joystick.on("button:ls:press", function () {
-        log("stop", 2);
-        skip = 0;
-        runMotor(0, 0, 'fwd');
-    });
-    joystick.on("button:ls:release", function () {
-        log("stop", 2);
-        skip = 0;
-        runMotor(0, 0, 'fwd');
-    });
+        });
+        joystick.on("stick:1:horizontal:left", function (position) {
+            joyY = Math.abs((position / 2) - Y_CENTER);
+            log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+
+        });
+        joystick.on("stick:3:vertical:up", function (position) {
+            joyX = Math.abs((position / 2) - X_CENTER);
+            log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+
+        });
+        joystick.on("stick:3:vertical:down", function (position) {
+            joyX = Math.abs((position / 2) + X_CENTER);
+            log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
+        });
+
+        joystick.on("stick:1:horizontal:right", function (position) {
+            joyY = Math.abs((position / 2) + Y_CENTER);
+            log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
+
+        });
+        joystick.on("stick:1:horizontal:left", function (position) {
+            joyY = Math.abs((position / 2) - Y_CENTER);
+            log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+
+        });
+        joystick.on("stick:3:vertical:up", function (position) {
+            joyX = Math.abs((position / 2) - X_CENTER);
+            log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+
+        });
+        joystick.on("stick:3:vertical:down", function (position) {
+            joyX = Math.abs((position / 2) + X_CENTER);
+            log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
+        });
+
+        joystick.on("stick:3:vertical:zero", function (position) {
+            log("A: " + position, 3);
+        });
+        joystick.on("stick:1:horizontal:zero", function (position) {
+            log("B: " + position, 3);
+        });
+        joystick.on("button:lb:press", function () {
+            runMotor(1, 1, 'sharpLeft');
+            skip = 1;
+        });
+        joystick.on("button:lb:release", function () {
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:rb:press", function () {
+            runMotor(1, 1, 'sharpRight');
+            skip = 1;
+        });
+        joystick.on("button:rb:release", function () {
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:ls:press", function () {
+            log("stop", 2);
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:ls:release", function () {
+            log("stop", 2);
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+
+    } else if (MODE=='DIRECT_INPUT'){
+
+        // DIRECT_INPUT via switch on Logitech remotem, less precise but cross stick works
+
+        joystick.on("stick:3:vertical:down", function (position) {
+            joyY = Math.abs((position / 2) + Y_CENTER);
+            log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
+
+        });
+        joystick.on("stick:3:vertical:up", function (position) {
+            joyY = Math.abs((position / 2) - Y_CENTER);
+            log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+
+        });
+        joystick.on("stick:3:horizontal:left", function (position) {
+            joyX = Math.abs((position / 2) - X_CENTER);
+            log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+
+        });
+        joystick.on("stick:3:horizontal:right", function (position) {
+            joyX = Math.abs((position / 2) + X_CENTER);
+            log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
+        });
+        joystick.on("stick:3:vertical:zero", function (position) {
+            log("A: " + position, 3);
+        });
+        joystick.on("stick:1:horizontal:zero", function (position) {
+            log("B: " + position, 3);
+        });
+        joystick.on("button:lb:press", function () {
+            runMotor(1, 1, 'sharpLeft');
+            skip = 1;
+        });
+        joystick.on("button:lb:release", function () {
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:rb:press", function () {
+            runMotor(1, 1, 'sharpRight');
+            skip = 1;
+        });
+        joystick.on("button:rb:release", function () {
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:rs:press", function () {
+            log("stop", 2);
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+        joystick.on("button:rs:release", function () {
+            log("stop", 2);
+            skip = 0;
+            runMotor(0, 0, 'fwd');
+        });
+    }
+
+
 });
 
 
@@ -216,7 +300,7 @@ var CommandDifferentialDrive = function (x, y) {
 
     moveY = leftMotor = rightMotor = (Y_CENTER - y) / Y_CENTER;
 
-    log(rightMotor + ' -- ' + leftMotor, 3);
+    // log(rightMotor + ' -- ' + leftMotor, 3);
 
     if (rightMotor == 1 && leftMotor == 1)
         return;
