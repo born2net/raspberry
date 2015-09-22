@@ -7,6 +7,7 @@ var HOST = 'localhost';
 var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
+var MODE = 'XINPUT'; // DIGITAL or DIRECT switch button
 var DEBUG = 1;
 var skip = 0;
 var joyX = 0;
@@ -193,6 +194,10 @@ function fixDec(val) {
 function runMotor(leftMotor, rightMotor, direction) {
     leftMotor = Math.abs(fixDec(leftMotor));
     rightMotor = Math.abs(fixDec(rightMotor));
+
+    // if motor is very low, must as well reset to avoid noise
+    leftMotor = leftMotor < 0.2 ? 0 : leftMotor;
+    rightMotor = rightMotor < 0.2 ? 0 : rightMotor;
     log('direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor, 1);
     var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
     if (SERVER_CONNECT)
