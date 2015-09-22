@@ -10,8 +10,7 @@ var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
 var DEBUG = 1;
 var skip = 0;
-var joyX = 0;
-var joyY = 0;
+
 
 console.log('\n\nremember to run /root/pytongpio/socketPython.py\n\n');
 
@@ -47,12 +46,16 @@ if (SERVER_CONNECT) {
 //var Y_CENTER = 516;
 //var THRESHOLD_LOW = 500;
 //var THRESHOLD_HIGH = 520;
+//var joyX = X_CENTER;
+//var joyY = Y_CENTER;
 
 /** The following setting were tested using the Logitech 710 joystick **/
 var X_CENTER = 510;
 var Y_CENTER = 516;
 var THRESHOLD_LOW = 490;
 var THRESHOLD_HIGH = 540;
+var joyX = X_CENTER;
+var joyY = Y_CENTER;
 
 Joystick.create("/dev/input/js0", function (err, joystick) {
     if (err)
