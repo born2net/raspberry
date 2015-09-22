@@ -8,7 +8,7 @@ var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
-var DEBUG = 3;
+var DEBUG = 1;
 var skip = 0;
 var joyX = 0;
 var joyY = 0;
@@ -58,6 +58,31 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
     if (err)
         throw err;
 
+    /** cross **/
+    joystick.on("button:crossup:press", function () {
+        log("A button:crossup:press",3);
+    });
+    joystick.on("button:crossup:press:up", function () {
+        log("B button:crossup:press:up",3);
+    });
+    joystick.on("button:crossdown:press", function () {
+        log("C button:crossdown:press",3);
+    });
+    joystick.on("button:crossdown:press:up", function () {
+        log("D button:crossdown:press:up",3);
+    });
+    joystick.on("button:crossleft:press", function () {
+        log("E button:crossleft:press",3);
+    });
+    joystick.on("button:crossleft:press:up", function () {
+        log("F button:crossleft:press:up",3);
+    });
+    joystick.on("button:crossright:press", function () {
+        log("G button:crossright:press",3);
+    });
+    joystick.on("button:crossright:press:up", function () {
+        log("H button:crossright:press:up",3);
+    });
     joystick.setMaximumAxesPosition(MAX_JOYSTICK);
 
     joystick.on("button:a:press", function () {
@@ -111,7 +136,6 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
     joystick.on("stick:3:horizontal:zero", function (position) {
         log("18: " + position, 3);
     });
-
 
     /** Drive the motors using H-Bridge **/
 
@@ -248,8 +272,6 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
             runMotor(0, 0, 'fwd');
         });
     }
-
-
 });
 
 
@@ -300,10 +322,10 @@ var CommandDifferentialDrive = function (x, y) {
 
     moveY = leftMotor = rightMotor = (Y_CENTER - y) / Y_CENTER;
 
-    // log(rightMotor + ' -- ' + leftMotor, 3);
-
     if (rightMotor == 1 && leftMotor == 1)
         return;
+
+    log(rightMotor + ' -- ' + leftMotor, 1);
 
     /** sharp turn: enable following lines
      if you wish to mix to stick sharp
