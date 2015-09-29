@@ -4,7 +4,7 @@
   Socket client to connect to Python server
 ***/
 
-console.log('remember to run /root/pytongpio/socketPython.py');
+console.log('remember to run /root/pytongpio/socketPython_rrb2.py');
 
 var net = require('net');
 var readline = require('readline');

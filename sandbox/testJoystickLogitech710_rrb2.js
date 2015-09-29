@@ -12,7 +12,7 @@ var DEBUG = 1;
 var skip = 0;
 
 
-console.log('\n\nremember to run /root/pytongpio/socketPython.py\n\n');
+console.log('\n\nremember to run /root/pytongpio/socketPython_rrb2.py\n\n');
 
 /////////////////////////////////
 // TCP Socket

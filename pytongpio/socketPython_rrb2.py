@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 #
-# Socket server that node.js connects to, auto starts in /etc/rc.local
+# Python socket server to control two DC motors using
+# RRB2 HAT: https://github.com/simonmonk/raspirobotboard2
 #
 
 import socket as soc
