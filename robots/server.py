@@ -81,7 +81,7 @@ def setServo(channel, value):
 
 while 1:  # This will loop forever
     socket.listen(1)
-    print "Robot has connected"
+    print "Robot has server is listening"
     connection, addrress = socket.accept()  # The program blocks here
     while 1:  # While somebody is connected
         data = connection.recv(1024)

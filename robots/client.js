@@ -13,6 +13,7 @@ var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
+var POLL_INTERVAL = 25;
 var DEBUG = 0;
 var skip = 0;
 
@@ -39,7 +40,7 @@ var Joystick = require("joystick-logitech-f710");
 if (SERVER_CONNECT) {
     var socket = new net.Socket();
     socket.connect(PORT, HOST, function () {
-        console.log('Robot connected');
+        console.log('Robot client connected');
     });
 
 // this event handler is called when data is received on the socket
@@ -89,7 +90,7 @@ function pollSendMotorCommands() {
         if (skip)
             return;
         controlDifferentialMotors(joyX, joyY);
-    }, 25);
+    }, POLL_INTERVAL);
 }
 
 /**
