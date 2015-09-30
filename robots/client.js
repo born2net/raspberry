@@ -20,9 +20,9 @@ GPIO.ULTRASONIC_IN = 23;
 GPIO.ULTRASONIC_OUT = 22;
 
 var SERVO_CENTER = 50;
-var TORAL_SERVOS = 16;
+var TOTAL_SERVOS = 16;
 
-for (var i = 0; i < TORAL_SERVOS; i++) {
+for (var i = 0; i < TOTAL_SERVOS; i++) {
     var s = 'var servo' + i + ' = SERVO_CENTER';
     eval(s);
 }
@@ -91,7 +91,7 @@ function sendData(leftMotor, rightMotor, direction) {
     };
 
     // construct current servos json data
-    for (var i = 0; i < TORAL_SERVOS; i++) {
+    for (var i = 0; i < TOTAL_SERVOS; i++) {
         var s = 'servo' + i;
         jData[s] = eval('servo' + i);
         eval(s);
