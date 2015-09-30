@@ -89,8 +89,11 @@ while 1:  # This will loop forever
             print "Disconnected..."
             break
         else:
+            try:
+                parsed_json = json.loads(data)
+            except:
+                continue
 
-            parsed_json = json.loads(data)
             motorLeft = parsed_json['leftMotor']
             motorRight = parsed_json['rightMotor']
             direction = parsed_json['direction']
