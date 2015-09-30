@@ -21,11 +21,12 @@ GPIO.ULTRASONIC_IN = 23;
 GPIO.ULTRASONIC_OUT = 22;
 
 var SERVO_CENTER = 50;
-var servo0 = SERVO_CENTER;
-var servo1 = SERVO_CENTER;
-var servo2 = SERVO_CENTER;
-var servo3 = SERVO_CENTER;
-var servo4 = SERVO_CENTER;
+var TORAL_SERVOS = 16;
+
+for (var i = 0; i < TORAL_SERVOS; i++) {
+    var s = 'var servo' + i + ' = SERVO_CENTER';
+    eval(s);
+}
 var net = require('net');
 var usonic = require('r-pi-usonic');
 var sensor = usonic.createSensor(GPIO.ULTRASONIC_IN, GPIO.ULTRASONIC_OUT, 650);
@@ -82,7 +83,7 @@ var joyY = Y_CENTER;
  @param {Number} i_playerData
  @return {Number} Unique clientId.
  **/
-function pollSendMotorCommands(){
+function pollSendMotorCommands() {
     this.m_pollSendMotorCommandss = setInterval(function () {
         log('x ' + joyX + ' y ' + joyY, 1);
         if (skip)
@@ -120,7 +121,7 @@ function fixDec(val) {
  @param {Number} rightMotor
  @param {direction} String
  **/
-function runMotor(leftMotor, rightMotor, direction) {
+function sendData(leftMotor, rightMotor, direction) {
     leftMotor = Math.abs(fixDec(leftMotor));
     rightMotor = Math.abs(fixDec(rightMotor));
 
@@ -134,18 +135,21 @@ function runMotor(leftMotor, rightMotor, direction) {
 
     log('ADA direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor, 1);
 
+    // construct motor json data
     var jData = {
         leftMotor: leftMotor,
         rightMotor: rightMotor,
-        direction: direction,
-        servo0: servo0,
-        servo1: servo1,
-        servo2: servo2,
-        servo3: servo3,
-        servo4: servo4
+        direction: direction
     };
 
-    //var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
+    // construct current servos json data
+    for (var i = 0; i < TORAL_SERVOS; i++) {
+        var s = 'servo' + i;
+        jData[s] = eval('servo' + i);
+        eval(s);
+    }
+
+    // send data to python server
     if (SERVER_CONNECT)
         socket.write(JSON.stringify(jData));
 }
@@ -217,7 +221,7 @@ function controlDifferentialMotors(x, y) {
             rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
         }
     }
-    runMotor(leftMotor, rightMotor, direction);
+    sendData(leftMotor, rightMotor, direction);
 }
 
 
@@ -282,26 +286,26 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
     });
     joystick.on("stick:2:vertical:up", function (position) {
         servo1 = Math.round(position / 10) + 50;
-        console.log("7: " + position + ' ' + servo1);
+        log("7: " + position + ' ' + servo1);
     });
     joystick.on("stick:2:vertical:down", function (position) {
-        servo1 = SERVO_CENTER - Math.round(position / 10) ;
+        servo1 = SERVO_CENTER - Math.round(position / 10);
         if (servo1 < 1)
             servo1 = 0;
-        console.log("8: " + position + ' ' + servo0);
+        log("8: " + position + ' ' + servo0);
     });
     joystick.on("stick:2:vertical:zero", function (position) {
         log("9: " + position, 3);
     });
     joystick.on("stick:2:horizontal:right", function (position) {
-        servo0 = SERVO_CENTER - Math.round(position / 10) ;
+        servo0 = SERVO_CENTER - Math.round(position / 10);
         if (servo0 < 1)
             servo0 = 0;
-        console.log("10: postion" + position + ' servo ' + servo0);
+        log("10: postion" + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:left", function (position) {
         servo0 = Math.round(position / 10) + 50;
-        console.log("11: position " + position + ' servo ' + servo0);
+        log("11: position " + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:zero", function (position) {
         log("12: " + position, 3);
@@ -356,30 +360,30 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
 
     /** Motor controls **/
     joystick.on("button:lb:press", function () {
-        runMotor(1, 1, 'sharpLeft');
+        sendData(1, 1, 'sharpLeft');
         skip = 1;
     });
     joystick.on("button:lb:release", function () {
         skip = 0;
-        runMotor(0, 0, 'fwd');
+        sendData(0, 0, 'fwd');
     });
     joystick.on("button:rb:press", function () {
-        runMotor(1, 1, 'sharpRight');
+        sendData(1, 1, 'sharpRight');
         skip = 1;
     });
     joystick.on("button:rb:release", function () {
         skip = 0;
-        runMotor(0, 0, 'fwd');
+        sendData(0, 0, 'fwd');
     });
     joystick.on("button:ls:press", function () {
         log("stop", 2);
         skip = 0;
-        runMotor(0, 0, 'fwd');
+        sendData(0, 0, 'fwd');
     });
     joystick.on("button:ls:release", function () {
         log("stop", 2);
         skip = 0;
-        runMotor(0, 0, 'fwd');
+        sendData(0, 0, 'fwd');
     });
 });
 

@@ -20,6 +20,7 @@ pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 totalServos = 5
+debug = 0
 #json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 #parsed_json = json.loads(json_string)
 #print(parsed_json['last_name'])
@@ -61,9 +62,9 @@ motorB.run(Adafruit_MotorHAT.FORWARD)
 def setServoPulse(channel, pulse):
     pulseLength = 1000000  # 1,000,000 us per second
     pulseLength /= 60  # 60 Hz
-    print "%d us per period" % pulseLength
+    # print "%d us per period" % pulseLength
     pulseLength /= 4096  # 12 bits of resolution
-    print "%d us per bit" % pulseLength
+    # print "%d us per bit" % pulseLength
     pulse *= 1000
     pulse /= pulseLength
     pwm.setPWM(channel, 0, pulse)
@@ -101,11 +102,12 @@ while 1:  # This will loop forever
             # servo0 = int(parsed_json['servo0'])
             # servo1 = int(parsed_json['servo1'])
 
-            print("motorLeft", motorLeft)
-            print("motorRight", motorRight)
-            print("direction", direction)
-            #print("servo0", servo0)
-            #print("servo1", servo1)
+            if debug:
+                print("motorLeft", motorLeft)
+                print("motorRight", motorRight)
+                print("direction", direction)
+                #print("servo0", servo0)
+                #print("servo1", servo1)
 
             for i in xrange(0, totalServos):
                 exec("setServo(%s,servo%s)" % (i, i))
@@ -141,8 +143,10 @@ while 1:  # This will loop forever
             motorA.setSpeed(int(motorRight))
             motorB.setSpeed(int(motorLeft))
 
+        ### enable the following lines if you want to send data back to client
         # data = "Echo: " + data
-        connection.send(data)
-        print data
+        # connection.send(data)
+        if debug:
+            print data
 
 connection.close()
