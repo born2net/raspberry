@@ -10,13 +10,16 @@
 
 var noderob = require('noderob').create({
     debug: 0,
-    serverConnect: 1
+    serverConnect: 1,
+    host: 'localhost',
+    port: 5432
 });
 
-socket = noderob.initSocket();
+noderob.setModel(noderob.MODEL_TANK)
+noderob.initSocket();
 noderob.initServos();
 noderob.initJoystick();
-noderob.startServerPolling();
+noderob.start();
 
 noderob.log('Starting NodeRob...', 1, 'yellow');
 

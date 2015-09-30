@@ -84,24 +84,29 @@ while 1:  # This will loop forever
     print "Robot has server is listening"
     connection, addrress = socket.accept()  # The program blocks here
     while 1:  # While somebody is connected
-        data = connection.recv(1024)
+        data = connection.recv(4096)
         if len(data) == 0:
             print "Disconnected..."
             break
         else:
+
+            ### process json commands ###
             try:
                 parsed_json = json.loads(data)
             except Exception:
                 continue
 
-            ### Servos ###
-            for i in xrange(0, totalServos):
-                a = int(parsed_json['servo'+str(i)])
-                exec("servo%s = %d" % (i, a))
-            for i in xrange(0, totalServos):
-                exec("setServo(%s,servo%s)" % (i, i))
+            ### servos ###
+            try:
+                for i in xrange(0, totalServos):
+                    a = int(parsed_json['servo'+str(i)])
+                    exec("servo%s = %d" % (i, a))
+                for i in xrange(0, totalServos):
+                    exec("setServo(%s,servo%s)" % (i, i))
+            except:
+                pass
 
-            ### Motors ###
+            ### motors ###
             motorLeft = parsed_json['leftMotor']
             motorRight = parsed_json['rightMotor']
             direction = parsed_json['direction']
