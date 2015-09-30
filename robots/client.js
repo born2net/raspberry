@@ -9,14 +9,14 @@
  **/
 
 var noderob = require('noderob').create({
-    debug: 1,
+    debug: 0,
     serverConnect: 1
 });
 
 socket = noderob.initSocket();
 noderob.initServos();
 noderob.initJoystick();
-noderob.pollSendMotorCommands();
+noderob.startServerPolling();
 
 noderob.log('Starting NodeRob...', 1, 'yellow');
 

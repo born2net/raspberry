@@ -20,7 +20,7 @@ pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 totalServos = 15
-debug = 0
+debug = 1
 
 #json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 #parsed_json = json.loads(json_string)
@@ -91,7 +91,7 @@ while 1:  # This will loop forever
         else:
             try:
                 parsed_json = json.loads(data)
-            except:
+            except Exception:
                 continue
 
             motorLeft = parsed_json['leftMotor']
@@ -102,20 +102,13 @@ while 1:  # This will loop forever
                 a = int(parsed_json['servo'+str(i)])
                 exec("servo%s = %d" % (i, a))
 
-            # servo0 = int(parsed_json['servo0'])
-            # servo1 = int(parsed_json['servo1'])
-
             if debug:
                 print("motorLeft", motorLeft)
                 print("motorRight", motorRight)
                 print("direction", direction)
-                #print("servo3", servo3)
-                #print("servo1", servo1)
 
             for i in xrange(0, totalServos):
                 exec("setServo(%s,servo%s)" % (i, i))
-                #setServo(0,servo0)
-                #setServo(1,servo1)
 
             if direction == 'fwd':
                 directionLeft = 1
@@ -140,7 +133,6 @@ while 1:  # This will loop forever
             elif direction == 'none':
                 continue
 
-            ### rr.set_motors(motorLeft, directionLeft, motorRight, directionRight)
             # print "Running ", motorLeft + " " + motorLeft
 
             motorA.setSpeed(int(motorRight))
