@@ -114,8 +114,8 @@ while 1:  # This will loop forever
 
             for i in xrange(0, totalServos):
                 exec("setServo(%s,servo%s)" % (i, i))
-            #setServo(0,servo0)
-            #setServo(1,servo1)
+                #setServo(0,servo0)
+                #setServo(1,servo1)
 
             if direction == 'fwd':
                 directionLeft = 1
