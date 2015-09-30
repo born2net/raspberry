@@ -19,7 +19,7 @@ pwm = PWM(0x40)
 pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
-
+totalServos = 5
 #json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 #parsed_json = json.loads(json_string)
 #print(parsed_json['last_name'])
@@ -93,17 +93,24 @@ while 1:  # This will loop forever
             motorLeft = parsed_json['leftMotor']
             motorRight = parsed_json['rightMotor']
             direction = parsed_json['direction']
-            servo0 = int(parsed_json['servo0'])
-            servo1 = int(parsed_json['servo1'])
+
+            for i in xrange(0, totalServos):
+                a = int(parsed_json['servo'+str(i)])
+                exec("servo%s = %d" % (i, a))
+
+            # servo0 = int(parsed_json['servo0'])
+            # servo1 = int(parsed_json['servo1'])
 
             print("motorLeft", motorLeft)
             print("motorRight", motorRight)
             print("direction", direction)
-            print("servo0", servo0)
-            print("servo1", servo1)
+            #print("servo0", servo0)
+            #print("servo1", servo1)
 
-            setServo(0,servo0)
-            setServo(1,servo1)
+            for i in xrange(0, totalServos):
+                exec("setServo(%s,servo%s)" % (i, i))
+            #setServo(0,servo0)
+            #setServo(1,servo1)
 
             if direction == 'fwd':
                 directionLeft = 1

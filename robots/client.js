@@ -23,6 +23,9 @@ GPIO.ULTRASONIC_OUT = 22;
 var SERVO_CENTER = 50;
 var servo0 = SERVO_CENTER;
 var servo1 = SERVO_CENTER;
+var servo2 = SERVO_CENTER;
+var servo3 = SERVO_CENTER;
+var servo4 = SERVO_CENTER;
 var net = require('net');
 var usonic = require('r-pi-usonic');
 var sensor = usonic.createSensor(GPIO.ULTRASONIC_IN, GPIO.ULTRASONIC_OUT, 650);
@@ -136,7 +139,10 @@ function runMotor(leftMotor, rightMotor, direction) {
         rightMotor: rightMotor,
         direction: direction,
         servo0: servo0,
-        servo1: servo1
+        servo1: servo1,
+        servo2: servo2,
+        servo3: servo3,
+        servo4: servo4
     };
 
     //var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
