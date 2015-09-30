@@ -123,18 +123,6 @@ function fixDec(val) {
  @param {direction} String
  **/
 function sendData(leftMotor, rightMotor, direction) {
-    leftMotor = Math.abs(fixDec(leftMotor));
-    rightMotor = Math.abs(fixDec(rightMotor));
-
-    // if motor is very low, might as well reset to avoid noise
-    leftMotor = leftMotor < 0.2 ? 0 : leftMotor;
-    rightMotor = rightMotor < 0.2 ? 0 : rightMotor;
-
-    // convert 0 (low) to 0.99 (high) into 0 - 255 for motor speed
-    leftMotor = Math.round(perc(leftMotor, 255) * 100);
-    rightMotor = Math.round(perc(rightMotor, 255) * 100);
-
-    log('ADA direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor, 1);
 
     // construct motor json data
     var jData = {
@@ -150,9 +138,34 @@ function sendData(leftMotor, rightMotor, direction) {
         eval(s);
     }
 
+    log(JSON.stringify(jData),1);
+
+
     // send data to python server
     if (SERVER_CONNECT)
         socket.write(JSON.stringify(jData));
+}
+
+/**
+ Drive motors and before we send to server we do final cleanup on data
+ @method driveMotors
+ @param {Number} leftMotor
+ @param {Number} rightMotor
+ @param {Number} direction
+ **/
+function driveMotors(leftMotor, rightMotor, direction) {
+    leftMotor = Math.abs(fixDec(leftMotor));
+    rightMotor = Math.abs(fixDec(rightMotor));
+
+    // if motor is very low, might as well reset to avoid noise
+    leftMotor = leftMotor < 0.2 ? 0 : leftMotor;
+    rightMotor = rightMotor < 0.2 ? 0 : rightMotor;
+
+    // convert 0 (low) to 0.99 (high) into 0 - 255 for motor speed
+    leftMotor = Math.round(perc(leftMotor, 255) * 100);
+    rightMotor = Math.round(perc(rightMotor, 255) * 100);
+
+    sendData(leftMotor, rightMotor, direction);
 }
 
 /**
@@ -222,7 +235,7 @@ function controlDifferentialMotors(x, y) {
             rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
         }
     }
-    sendData(leftMotor, rightMotor, direction);
+    driveMotors(leftMotor, rightMotor, direction);
 }
 
 /**
@@ -371,30 +384,30 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
 
     /** Motor controls **/
     joystick.on("button:lb:press", function () {
-        sendData(1, 1, 'sharpLeft');
+        driveMotors(1, 1, 'sharpLeft');
         skip = 1;
     });
     joystick.on("button:lb:release", function () {
         skip = 0;
-        sendData(0, 0, 'fwd');
+        driveMotors(0, 0, 'fwd');
     });
     joystick.on("button:rb:press", function () {
-        sendData(1, 1, 'sharpRight');
+        driveMotors(1, 1, 'sharpRight');
         skip = 1;
     });
     joystick.on("button:rb:release", function () {
         skip = 0;
-        sendData(0, 0, 'fwd');
+        driveMotors(0, 0, 'fwd');
     });
     joystick.on("button:ls:press", function () {
         log("stop", 2);
         skip = 0;
-        sendData(0, 0, 'fwd');
+        driveMotors(0, 0, 'fwd');
     });
     joystick.on("button:ls:release", function () {
         log("stop", 2);
         skip = 0;
-        sendData(0, 0, 'fwd');
+        driveMotors(0, 0, 'fwd');
     });
 });
 

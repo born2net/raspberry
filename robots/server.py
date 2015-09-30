@@ -19,7 +19,7 @@ pwm = PWM(0x40)
 pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
-totalServos = 8
+totalServos = 15
 debug = 0
 #json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 #parsed_json = json.loads(json_string)
