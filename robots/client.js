@@ -13,7 +13,7 @@ var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
-var DEBUG = 3;
+var DEBUG = 0;
 var skip = 0;
 
 var GPIO = {};
@@ -85,7 +85,7 @@ function pollSendMotorCommands(){
         if (skip)
             return;
         controlDifferentialMotors(joyX, joyY);
-    }, 50);
+    }, 25);
 }
 
 /**
@@ -291,11 +291,11 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
         servo0 = SERVO_CENTER - Math.round(position / 10) ;
         if (servo0 < 1)
             servo0 = 0;
-        console.log("10: " + position + ' ' + servo0);
+        console.log("10: postion" + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:left", function (position) {
         servo0 = Math.round(position / 10) + 50;
-        console.log("11: " + position + ' ' + servo0);
+        console.log("11: position " + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:zero", function (position) {
         log("12: " + position, 3);

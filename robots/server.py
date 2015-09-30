@@ -16,6 +16,7 @@ import atexit
 
 # Servo config
 pwm = PWM(0x40)
+pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 
@@ -70,11 +71,9 @@ def setServoPulse(channel, pulse):
 
 def setServo(channel, value):
     value = float(value)
-    print "value 1", value
     value = value / 100 * 450
-    print "value 2", value
     value = value + servoMin
-    print "value 3", value
+    # print "value ", value
     value = int(value)
     pwm.setPWM(channel, 0, value)
 
@@ -100,6 +99,8 @@ while 1:  # This will loop forever
             print("motorLeft", motorLeft)
             print("motorRight", motorRight)
             print("direction", direction)
+            print("servo0", servo0)
+            print("servo1", servo1)
 
             setServo(0,servo0)
             setServo(1,servo1)
@@ -133,7 +134,7 @@ while 1:  # This will loop forever
             motorA.setSpeed(int(motorRight))
             motorB.setSpeed(int(motorLeft))
 
-        data = "Echo: " + data
+        # data = "Echo: " + data
         connection.send(data)
         print data
 
