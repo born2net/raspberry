@@ -20,6 +20,9 @@ var GPIO = {};
 GPIO.ULTRASONIC_IN = 23;
 GPIO.ULTRASONIC_OUT = 22;
 
+var SERVO_CENTER = 50;
+var servo0 = SERVO_CENTER;
+var servo1 = SERVO_CENTER;
 var net = require('net');
 var usonic = require('r-pi-usonic');
 var sensor = usonic.createSensor(GPIO.ULTRASONIC_IN, GPIO.ULTRASONIC_OUT, 650);
@@ -82,7 +85,7 @@ function pollSendMotorCommands(){
         if (skip)
             return;
         controlDifferentialMotors(joyX, joyY);
-    }, 200);
+    }, 50);
 }
 
 /**
@@ -128,9 +131,17 @@ function runMotor(leftMotor, rightMotor, direction) {
 
     log('ADA direction ' + direction + ' leftMotor ' + leftMotor + ' rightMotor ' + rightMotor, 1);
 
-    var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
+    var jData = {
+        leftMotor: leftMotor,
+        rightMotor: rightMotor,
+        direction: direction,
+        servo0: servo0,
+        servo1: servo1
+    };
+
+    //var value = "MOTOR-" + leftMotor + '-' + rightMotor + '-' + direction;
     if (SERVER_CONNECT)
-        socket.write(value);
+        socket.write(JSON.stringify(jData));
 }
 
 /**
@@ -264,19 +275,27 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
         log("3: " + position, 3);
     });
     joystick.on("stick:2:vertical:up", function (position) {
-        log("7: " + position, 3);
+        servo1 = Math.round(position / 10) + 50;
+        console.log("7: " + position + ' ' + servo1);
     });
     joystick.on("stick:2:vertical:down", function (position) {
-        log("8: " + position, 3);
+        servo1 = SERVO_CENTER - Math.round(position / 10) ;
+        if (servo1 < 1)
+            servo1 = 0;
+        console.log("8: " + position + ' ' + servo0);
     });
     joystick.on("stick:2:vertical:zero", function (position) {
         log("9: " + position, 3);
     });
     joystick.on("stick:2:horizontal:right", function (position) {
-        log("10: " + position, 3);
+        servo0 = SERVO_CENTER - Math.round(position / 10) ;
+        if (servo0 < 1)
+            servo0 = 0;
+        console.log("10: " + position + ' ' + servo0);
     });
     joystick.on("stick:2:horizontal:left", function (position) {
-        log("11: " + position, 3);
+        servo0 = Math.round(position / 10) + 50;
+        console.log("11: " + position + ' ' + servo0);
     });
     joystick.on("stick:2:horizontal:zero", function (position) {
         log("12: " + position, 3);
