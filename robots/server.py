@@ -94,24 +94,22 @@ while 1:  # This will loop forever
             except Exception:
                 continue
 
-            motorLeft = parsed_json['leftMotor']
-            motorRight = parsed_json['rightMotor']
-            direction = parsed_json['direction']
-
+            ### Servos ###
             for i in xrange(0, totalServos):
                 a = int(parsed_json['servo'+str(i)])
                 exec("servo%s = %d" % (i, a))
+            for i in xrange(0, totalServos):
+                exec("setServo(%s,servo%s)" % (i, i))
 
-            # servo0 = int(parsed_json['servo0'])
-            # servo1 = int(parsed_json['servo1'])
+            ### Motors ###
+            motorLeft = parsed_json['leftMotor']
+            motorRight = parsed_json['rightMotor']
+            direction = parsed_json['direction']
 
             if debug:
                 print("motorLeft", motorLeft)
                 print("motorRight", motorRight)
                 print("direction", direction)
-
-            for i in xrange(0, totalServos):
-                exec("setServo(%s,servo%s)" % (i, i))
 
             if direction == 'fwd':
                 directionLeft = 1
@@ -136,7 +134,6 @@ while 1:  # This will loop forever
             elif direction == 'none':
                 continue
 
-            ### rr.set_motors(motorLeft, directionLeft, motorRight, directionRight)
             # print "Running ", motorLeft + " " + motorLeft
 
             motorA.setSpeed(int(motorRight))
