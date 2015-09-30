@@ -8,13 +8,11 @@
  which listens to commands from this client.js script for executions (i.e.: motor controls)
  **/
 
-var HOST = 'localhost';
-var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
 var POLL_INTERVAL = 25;
-var DEBUG = 0;
+var DEBUG = 1;
 var skip = 0;
 
 var GPIO = {};
@@ -28,37 +26,17 @@ for (var i = 0; i < TORAL_SERVOS; i++) {
     var s = 'var servo' + i + ' = SERVO_CENTER';
     eval(s);
 }
-var net = require('net');
+var noderob = require('noderob').create({
+    debug: DEBUG,
+    serverConnect: SERVER_CONNECT
+});
+
 var usonic = require('r-pi-usonic');
 var sensor = usonic.createSensor(GPIO.ULTRASONIC_IN, GPIO.ULTRASONIC_OUT, 650);
 var Joystick = require("joystick-logitech-f710");
 
-
-/**
- Socket client to python server
- **/
-if (SERVER_CONNECT) {
-    var socket = new net.Socket();
-    socket.connect(PORT, HOST, function () {
-        console.log('Robot client connected');
-    });
-
-// this event handler is called when data is received on the socket
-    socket.on('data', function (data) {
-        //log('DATA: ' + data);
-    });
-
-// if the socket is closed, this handler will be called
-    socket.on('close', function () {
-        log('Connection closed');
-    });
-
-// catch cont-c
-//process.on('SIGINT', function(){
-//    socket.destroy();
-//    process.exit();
-//});
-}
+socket = noderob.initSocket();
+noderob.log('Starting NodeRob...', 1, 'yellow');
 
 
 /** The following setting were tested using raw potentiometer (adjustable resistor knobs) as joystick **/
@@ -86,33 +64,14 @@ var joyY = Y_CENTER;
  **/
 function pollSendMotorCommands() {
     this.m_pollSendMotorCommandss = setInterval(function () {
-        log('x ' + joyX + ' y ' + joyY, 1);
+        noderob.log('x ' + joyX + ' y ' + joyY, 1, 'white');
+        //log('x ' + joyX + ' y ' + joyY, 1);
         if (skip)
             return;
         controlDifferentialMotors(joyX, joyY);
     }, POLL_INTERVAL);
 }
 
-/**
- Get percenet
- @method perc
- @param {Number} perc
- @param {Number} amount
- @return {Number}
- **/
-function perc(num, amount) {
-    return num * amount / 100;
-}
-
-/**
- Fix string / numeric to decimal
- @method fixDec
- @param {Number} val
- @return {Number}
- **/
-function fixDec(val) {
-    return parseFloat(val).toFixed(2)
-}
 
 /**
  Send motor run to remote server, configured for Adafruit Mini HAT for Raspberry pi
@@ -138,7 +97,8 @@ function sendData(leftMotor, rightMotor, direction) {
         eval(s);
     }
 
-    log(JSON.stringify(jData),1);
+    //log(JSON.stringify(jData), 1);
+    noderob.log(JSON.stringify(jData), 1, 'yellow');
 
 
     // send data to python server
@@ -154,16 +114,16 @@ function sendData(leftMotor, rightMotor, direction) {
  @param {Number} direction
  **/
 function driveMotors(leftMotor, rightMotor, direction) {
-    leftMotor = Math.abs(fixDec(leftMotor));
-    rightMotor = Math.abs(fixDec(rightMotor));
+    leftMotor = Math.abs(noderob.fixDec(leftMotor));
+    rightMotor = Math.abs(noderob.fixDec(rightMotor));
 
     // if motor is very low, might as well reset to avoid noise
     leftMotor = leftMotor < 0.2 ? 0 : leftMotor;
     rightMotor = rightMotor < 0.2 ? 0 : rightMotor;
 
     // convert 0 (low) to 0.99 (high) into 0 - 255 for motor speed
-    leftMotor = Math.round(perc(leftMotor, 255) * 100);
-    rightMotor = Math.round(perc(rightMotor, 255) * 100);
+    leftMotor = Math.round(noderob.perc(leftMotor, 255) * 100);
+    rightMotor = Math.round(noderob.perc(rightMotor, 255) * 100);
 
     sendData(leftMotor, rightMotor, direction);
 }
@@ -183,7 +143,8 @@ function controlDifferentialMotors(x, y) {
     if (rightMotor == 1 && leftMotor == 1)
         return;
 
-    log(rightMotor + ' -- ' + leftMotor, 1);
+    //log(rightMotor + ' -- ' + leftMotor, 1);
+    noderob.log(rightMotor + ' -- ' + leftMotor, 1, 'yellow');
 
     /**
      sharp turn: enable following lines if you wish to mix
@@ -208,13 +169,13 @@ function controlDifferentialMotors(x, y) {
         if (x < THRESHOLD_LOW) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
-            leftMotor = leftMotor - perc(leftMotor, reducePerc);
+            leftMotor = leftMotor - noderob.perc(leftMotor, reducePerc);
         }
         // right
         if (x > THRESHOLD_HIGH) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
-            rightMotor = rightMotor + perc(rightMotor, reducePerc);
+            rightMotor = rightMotor + noderob.perc(rightMotor, reducePerc);
         }
     }
 
@@ -226,28 +187,16 @@ function controlDifferentialMotors(x, y) {
         if (x < THRESHOLD_LOW) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
-            leftMotor = Math.abs(leftMotor) + perc(leftMotor, reducePerc);
+            leftMotor = Math.abs(leftMotor) + noderob.perc(leftMotor, reducePerc);
         }
         /** RIGHT **/
         if (x > THRESHOLD_HIGH) {
             reduceX = X_CENTER - x;
             reducePerc = (reduceX / X_CENTER) * 100;
-            rightMotor = Math.abs(rightMotor) - perc(rightMotor, reducePerc);
+            rightMotor = Math.abs(rightMotor) - noderob.perc(rightMotor, reducePerc);
         }
     }
     driveMotors(leftMotor, rightMotor, direction);
-}
-
-/**
- Log data to console
- @method log
- @param {String} msg
- @return {Number} level
- **/
-function log(msg, level) {
-    if (DEBUG >= level) {
-        console.log(msg);
-    }
 }
 
 /**
@@ -260,126 +209,126 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
 
     /** cross **/
     joystick.on("button:crossup:press", function () {
-        log("A button:crossup:press", 3);
+        //log("A button:crossup:press", 3);
         servo2 = 100;
     });
     joystick.on("button:crossup:press:up", function () {
-        log("B button:crossup:press:up", 3);
+        //log("B button:crossup:press:up", 3);
         servo2 = 0;
     });
     joystick.on("button:crossdown:press", function () {
-        log("C button:crossdown:press", 3);
+        //log("C button:crossdown:press", 3);
     });
     joystick.on("button:crossdown:press:up", function () {
-        log("D button:crossdown:press:up", 3);
+        //log("D button:crossdown:press:up", 3);
     });
     joystick.on("button:crossleft:press", function () {
-        log("E button:crossleft:press", 3);
+        //log("E button:crossleft:press", 3);
     });
     joystick.on("button:crossleft:press:up", function () {
-        log("F button:crossleft:press:up", 3);
+        //log("F button:crossleft:press:up", 3);
     });
     joystick.on("button:crossright:press", function () {
-        log("G button:crossright:press", 3);
+        //log("G button:crossright:press", 3);
     });
     joystick.on("button:crossright:press:up", function () {
-        log("H button:crossright:press:up", 3);
+        //log("H button:crossright:press:up", 3);
     });
     joystick.setMaximumAxesPosition(MAX_JOYSTICK);
 
     joystick.on("button:a:press", function () {
-        log("a1", 3);
+        //log("a1", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2", 3);
+        //log("a2", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2", 3);
+        //log("a2", 3);
     });
     joystick.on("button:a:release", function () {
-        log("a2", 3);
+        //log("a2", 3);
     });
     joystick.on("stick:1:vertical:up", function (position) {
-        log("1: " + position, 3);
+        //log("1: " + position, 3);
     });
     joystick.on("stick:1:vertical:down", function (position) {
-        log("2: " + position, 3);
+        //log("2: " + position, 3);
     });
     joystick.on("stick:1:vertical:zero", function (position) {
-        log("3: " + position, 3);
+        //log("3: " + position, 3);
     });
     joystick.on("stick:2:vertical:up", function (position) {
         servo1 = Math.round(position / 10) + 50;
-        log("7: " + position + ' ' + servo1);
+        //log("7: " + position + ' ' + servo1);
     });
     joystick.on("stick:2:vertical:down", function (position) {
         servo1 = SERVO_CENTER - Math.round(position / 10);
         if (servo1 < 1)
             servo1 = 0;
-        log("8: " + position + ' ' + servo0);
+        //log("8: " + position + ' ' + servo0);
     });
     joystick.on("stick:2:vertical:zero", function (position) {
-        log("9: " + position, 3);
+        //log("9: " + position, 3);
     });
     joystick.on("stick:2:horizontal:right", function (position) {
         servo0 = SERVO_CENTER - Math.round(position / 10);
         if (servo0 < 1)
             servo0 = 0;
-        log("10: postion" + position + ' servo ' + servo0);
+        //log("10: postion" + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:left", function (position) {
         servo0 = Math.round(position / 10) + 50;
-        log("11: position " + position + ' servo ' + servo0);
+        //log("11: position " + position + ' servo ' + servo0);
     });
     joystick.on("stick:2:horizontal:zero", function (position) {
-        log("12: " + position, 3);
+        //log("12: " + position, 3);
     });
     joystick.on("stick:3:horizontal:right", function (position) {
-        log("16: " + position, 3);
+        //log("16: " + position, 3);
     });
     joystick.on("stick:3:horizontal:left", function (position) {
-        log("17: " + position, 3);
+        //log("17: " + position, 3);
     });
     joystick.on("stick:3:horizontal:zero", function (position) {
-        log("18: " + position, 3);
+        //log("18: " + position, 3);
     });
     joystick.on("stick:1:horizontal:right", function (position) {
         joyY = Math.abs((position / 2) + Y_CENTER);
-        log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
+        //log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
     });
     joystick.on("stick:1:horizontal:left", function (position) {
         joyY = Math.abs((position / 2) - Y_CENTER);
-        log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+        //log("STICK UP: " + position + ' joyY: ' + joyY, 3);
     });
     joystick.on("stick:3:vertical:up", function (position) {
         joyX = Math.abs((position / 2) - X_CENTER);
-        log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+        //log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
     });
     joystick.on("stick:3:vertical:down", function (position) {
         joyX = Math.abs((position / 2) + X_CENTER);
-        log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
+        //log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
     });
     joystick.on("stick:1:horizontal:right", function (position) {
         joyY = Math.abs((position / 2) + Y_CENTER);
-        log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
+        //log("STICK DOWN: " + position + ' joyY: ' + joyY, 3);
     });
     joystick.on("stick:1:horizontal:left", function (position) {
         joyY = Math.abs((position / 2) - Y_CENTER);
-        log("STICK UP: " + position + ' joyY: ' + joyY, 3);
+        //log("STICK UP: " + position + ' joyY: ' + joyY, 3);
     });
     joystick.on("stick:3:vertical:up", function (position) {
         joyX = Math.abs((position / 2) - X_CENTER);
-        log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
+        //log("STICK LEFT: " + position + ' joyX: ' + joyX, 3);
     });
     joystick.on("stick:3:vertical:down", function (position) {
         joyX = Math.abs((position / 2) + X_CENTER);
-        log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
+        //log("STICK RIGHT: " + position + ' joyX: ' + joyX, 3);
     });
     joystick.on("stick:3:vertical:zero", function (position) {
-        log("A: " + position, 3);
+        //log("A: " + position, 3);
     });
     joystick.on("stick:1:horizontal:zero", function (position) {
-        log("B: " + position, 3);
+        //log("B: " + position, 3);
     });
 
     /** Motor controls **/
@@ -400,12 +349,12 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
         driveMotors(0, 0, 'fwd');
     });
     joystick.on("button:ls:press", function () {
-        log("stop", 2);
+        //log("stop", 2);
         skip = 0;
         driveMotors(0, 0, 'fwd');
     });
     joystick.on("button:ls:release", function () {
-        log("stop", 2);
+        //log("stop", 2);
         skip = 0;
         driveMotors(0, 0, 'fwd');
     });
