@@ -19,7 +19,7 @@ pwm = PWM(0x40)
 pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
-totalServos = 5
+totalServos = 8
 debug = 0
 #json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 #parsed_json = json.loads(json_string)
@@ -106,7 +106,7 @@ while 1:  # This will loop forever
                 print("motorLeft", motorLeft)
                 print("motorRight", motorRight)
                 print("direction", direction)
-                #print("servo0", servo0)
+            print("servo3", servo3)
                 #print("servo1", servo1)
 
             for i in xrange(0, totalServos):

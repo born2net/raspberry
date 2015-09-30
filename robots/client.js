@@ -13,7 +13,7 @@ var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
-var DEBUG = 0;
+var DEBUG = 2;
 var skip = 0;
 
 var GPIO = {};
@@ -224,24 +224,34 @@ function controlDifferentialMotors(x, y) {
     sendData(leftMotor, rightMotor, direction);
 }
 
-
+/**
+ Log data to console
+ @method log
+ @param {String} msg
+ @return {Number} level
+ **/
 function log(msg, level) {
     if (DEBUG >= level) {
         console.log(msg);
     }
 }
 
-
+/**
+ Listen to /dev/js0 inputts
+ @method Joystick.create
+ **/
 Joystick.create("/dev/input/js0", function (err, joystick) {
     if (err)
         throw err;
 
     /** cross **/
     joystick.on("button:crossup:press", function () {
-        log("A button:crossup:press", 3);
+        console.log("A button:crossup:press", 3);
+        servo2 = 100;
     });
     joystick.on("button:crossup:press:up", function () {
-        log("B button:crossup:press:up", 3);
+        console.log("B button:crossup:press:up", 3);
+        servo2 = 0;
     });
     joystick.on("button:crossdown:press", function () {
         log("C button:crossdown:press", 3);
