@@ -106,7 +106,7 @@ while 1:  # This will loop forever
                 print("motorLeft", motorLeft)
                 print("motorRight", motorRight)
                 print("direction", direction)
-            print("servo3", servo3)
+                #print("servo3", servo3)
                 #print("servo1", servo1)
 
             for i in xrange(0, totalServos):

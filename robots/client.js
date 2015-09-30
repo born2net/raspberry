@@ -13,7 +13,7 @@ var PORT = 5432;
 var SERVER_CONNECT = 1;
 var MAX_JOYSTICK = 1017;
 var MODE = 'XINPUT'; // XINPUT or DIRECT_INPUT switch button
-var DEBUG = 2;
+var DEBUG = 0;
 var skip = 0;
 
 var GPIO = {};
@@ -246,11 +246,11 @@ Joystick.create("/dev/input/js0", function (err, joystick) {
 
     /** cross **/
     joystick.on("button:crossup:press", function () {
-        console.log("A button:crossup:press", 3);
+        log("A button:crossup:press", 3);
         servo2 = 100;
     });
     joystick.on("button:crossup:press:up", function () {
-        console.log("B button:crossup:press:up", 3);
+        log("B button:crossup:press:up", 3);
         servo2 = 0;
     });
     joystick.on("button:crossdown:press", function () {
