@@ -1,0 +1,32 @@
+{
+  "name": "noderob",
+  "version": "1.1.7",
+  "description": "Raspberry PI powered Robot",
+  "main": "client.js",
+  "dependencies": {
+  },
+  "dependencies": {
+   "joystick-logitech-f710": ">0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/born2net/raspberry.git"
+  },
+  "keywords": [
+    "Raspberry",
+    "PI",
+    "node.js",
+    "robot"
+  ],
+  "author": "Sean Levy <born2net@gmail.com> (http://javascriptninja.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/born2net/raspberry/issues"
+  },
+  "readme": "Node.js powered Advanced Raspberry Robot",
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/born2net/raspberry#readme"
+}

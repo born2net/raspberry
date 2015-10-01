@@ -8,12 +8,22 @@ var noderob = require('noderob').create({
     pollInterval: 25
 });
 
-noderob.setModel(noderob.MODEL_TANK);
 noderob.initSocket();
 noderob.initServos();
-noderob.initJoystick();
-noderob.start();
+noderob.initJoystick(function(joystick){
+    var self = noderob;
 
+    // override specific behavior
+    joystick.on("button:crossup:press", function () {
+        self.m_servo2 = 25;
+    });
+
+    joystick.on("button:crossup:press:up", function () {
+        self.m_servo2 = 0;
+    });
+});
+
+noderob.start();
 noderob.log('Starting NodeRob...', 1, 'yellow');
 
 
