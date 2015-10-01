@@ -47,17 +47,17 @@ lcdValue = ''
 # print(parsed_json['last_name'])
 
 def appExiting():
+    socket.close()
     if enableMotorHAT:
         mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
         mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
         mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
         mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
-    socket.close()
-
 
 def logLCD(data, color):
     if enableLCDHAT:
-        lcd.set_color(1.0, 0.0, 0.0)
+        color = color.split(',')
+        lcd.set_color(float(color[0]),float(color[1]),float(color[2]))
         lcd.clear()
         lcd.message(data)
 
@@ -97,7 +97,7 @@ if enableMotorHAT:
 while 1:
     socket.listen(1)
     print "Robot has server is listening"
-    logLCD('Loading...\nPlease wait...', 'red')
+    logLCD('Loading...\nPlease wait...', '1.0, 0.0, 0.0')
     connection, addrress = socket.accept()  # The program blocks here
     while 1:  # While somebody is connected
         data = connection.recv(4096)
@@ -118,7 +118,7 @@ while 1:
                 if currentLcdValue != lcdValue:
                     lcdValue = currentLcdValue
                     lcdColor = parsed_json['lcdColor']
-                    logLCD(lcdValue, lcdValue)
+                    logLCD(lcdValue, lcdColor)
 
             ### servos ###
             if enableServoHAT:
