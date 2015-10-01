@@ -1,14 +1,23 @@
 #!/usr/bin/python
-
 #
 # Python socket server to control two DC motors using
 # the Adafruit mini HAT: https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library
 #
+import socket as soc
+import sys
+import re
+import time
+import json
+import atexit
+
+totalArgs = len(sys.argv)
+if totalArgs < 3:
+    print "Usage: server.py [0/1 server] [0/1 motors]"
+    sys.exit()
 
 # Enable / Disable HATs
-enableServoHAT = 1
-enableMotorHAT = 1
-
+enableServoHAT = int(sys.argv[1])
+enableMotorHAT = int(sys.argv[2])
 
 if enableMotorHAT:
     from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
@@ -19,21 +28,14 @@ if enableServoHAT:
     pwm = PWM(0x40)
     pwm.setPWMFreq(60)
 
-import socket as soc
-import sys
-import re
-import time
-import json
-import atexit
-
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 totalServos = 15
 debug = 0
 
-#json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
-#parsed_json = json.loads(json_string)
-#print(parsed_json['last_name'])
+# json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
+# parsed_json = json.loads(json_string)
+# print(parsed_json['last_name'])
 
 def turnOffMotors():
     print "closing app"
@@ -43,11 +45,13 @@ def turnOffMotors():
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
     socket.close()
 
+
 atexit.register(turnOffMotors)
 
 socket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
 address = ('localhost', 5432)  # Create an address tuple
 socket.bind(address)
+
 
 # recommended for auto-disabling motors on shutdown!
 def turnOffMotors():
@@ -56,7 +60,9 @@ def turnOffMotors():
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
 
+
 atexit.register(turnOffMotors)
+
 
 def setServoPulse(channel, pulse):
     pulseLength = 1000000  # 1,000,000 us per second
@@ -68,6 +74,7 @@ def setServoPulse(channel, pulse):
     pulse /= pulseLength
     pwm.setPWM(channel, 0, pulse)
 
+
 def setServo(channel, value):
     value = float(value)
     value = value / 100 * 450
@@ -75,6 +82,7 @@ def setServo(channel, value):
     # print "value ", value
     value = int(value)
     pwm.setPWM(channel, 0, value)
+
 
 if enableMotorHAT:
     motorA = mh.getMotor(1)
@@ -103,10 +111,10 @@ while 1:  # This will loop forever
             if enableServoHAT:
                 try:
                     for i in xrange(0, totalServos):
-                        a = int(parsed_json['servo'+str(i)])
-                        exec("servo%s = %d" % (i, a))
+                        a = int(parsed_json['servo' + str(i)])
+                        exec ("servo%s = %d" % (i, a))
                     for i in xrange(0, totalServos):
-                        exec("setServo(%s,servo%s)" % (i, i))
+                        exec ("setServo(%s,servo%s)" % (i, i))
                 except:
                     pass
 
