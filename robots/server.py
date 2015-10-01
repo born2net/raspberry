@@ -18,13 +18,21 @@ if totalArgs < 3:
 # Enable / Disable HATs
 enableServoHAT = int(sys.argv[1])
 enableMotorHAT = int(sys.argv[2])
+enableLCDHAT = int(sys.argv[3])
+
+if enableLCDHAT:
+    import Adafruit_CharLCD as LCD
+
+    lcd = LCD.Adafruit_CharLCDPlate()
 
 if enableMotorHAT:
     from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
+
     mh = Adafruit_MotorHAT(addr=0x60)
 
 if enableServoHAT:
     from Adafruit_PWM_Servo_Driver import PWM
+
     pwm = PWM(0x40)
     pwm.setPWMFreq(60)
 
@@ -32,33 +40,33 @@ servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 totalServos = 15
 debug = 0
+lcdValue = ''
 
 # json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 # parsed_json = json.loads(json_string)
 # print(parsed_json['last_name'])
 
-def turnOffMotors():
-    print "closing app"
-    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+def appExiting():
+    if enableMotorHAT:
+        mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+        mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+        mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+        mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
     socket.close()
 
 
-atexit.register(turnOffMotors)
+def logLCD(data, color):
+    if enableLCDHAT:
+        lcd.set_color(1.0, 0.0, 0.0)
+        lcd.clear()
+        lcd.message(data)
+
 
 socket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
 address = ('localhost', 5432)  # Create an address tuple
 socket.bind(address)
+atexit.register(appExiting)
 
-def turnOffMotors():
-    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
-    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
-
-atexit.register(turnOffMotors)
 
 def setServoPulse(channel, pulse):
     pulseLength = 1000000  # 1,000,000 us per second
@@ -70,6 +78,7 @@ def setServoPulse(channel, pulse):
     pulse /= pulseLength
     pwm.setPWM(channel, 0, pulse)
 
+
 def setServo(channel, value):
     value = float(value)
     value = value / 100 * 450
@@ -77,6 +86,7 @@ def setServo(channel, value):
     # print "value ", value
     value = int(value)
     pwm.setPWM(channel, 0, value)
+
 
 if enableMotorHAT:
     motorA = mh.getMotor(1)
@@ -87,6 +97,7 @@ if enableMotorHAT:
 while 1:
     socket.listen(1)
     print "Robot has server is listening"
+    logLCD('Loading...\nPlease wait...', 'red')
     connection, addrress = socket.accept()  # The program blocks here
     while 1:  # While somebody is connected
         data = connection.recv(4096)
@@ -100,6 +111,14 @@ while 1:
                 parsed_json = json.loads(data)
             except Exception:
                 continue
+
+            ### lcd ###
+            if enableLCDHAT:
+                currentLcdValue = parsed_json['lcdValue']
+                if currentLcdValue != lcdValue:
+                    lcdValue = currentLcdValue
+                    lcdColor = parsed_json['lcdColor']
+                    logLCD(lcdValue, lcdValue)
 
             ### servos ###
             if enableServoHAT:

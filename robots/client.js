@@ -26,6 +26,10 @@ noderob.initJoystick(function(joystick){
     });
 });
 
+var a = 1;
+setInterval(function(){
+    noderob.setLCD('text 123\nseconds: ' + a++,'red');
+},1000);
 noderob.start();
 noderob.log('Starting NodeRob...', 1, 'yellow');
 
