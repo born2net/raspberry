@@ -24,6 +24,11 @@ if enableLCDHAT:
     import Adafruit_CharLCD as LCD
 
     lcd = LCD.Adafruit_CharLCDPlate()
+    buttons = ((LCD.SELECT, 'LCD:select'),
+               (LCD.LEFT, 'LCD:left'),
+               (LCD.UP, 'LCD:up'),
+               (LCD.DOWN, 'LCD:down'),
+               (LCD.RIGHT, 'LCD:right'))
 
 if enableMotorHAT:
     from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
@@ -42,6 +47,7 @@ totalServos = 15
 debug = 0
 lcdValue = ''
 
+
 # json_string = '{"first_name": "Guido", "last_name":"Rossum"}'
 # parsed_json = json.loads(json_string)
 # print(parsed_json['last_name'])
@@ -54,10 +60,11 @@ def appExiting():
         mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
         mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
 
+
 def logLCD(data, color):
     if enableLCDHAT:
         color = color.split(',')
-        lcd.set_color(float(color[0]),float(color[1]),float(color[2]))
+        lcd.set_color(float(color[0]), float(color[1]), float(color[2]))
         lcd.clear()
         lcd.message(data)
 
@@ -111,6 +118,14 @@ while 1:
                 parsed_json = json.loads(data)
             except Exception:
                 continue
+
+            ### lcd buttons ###
+            if enableLCDHAT:
+                for button in buttons:
+                    if lcd.is_pressed(button[0]):
+                        # print button[1]
+                        if connection:
+                            connection.send(button[1])
 
             ### lcd ###
             if enableLCDHAT:
