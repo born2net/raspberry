@@ -5,8 +5,20 @@
 # the Adafruit mini HAT: https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library
 #
 
-from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
-from Adafruit_PWM_Servo_Driver import PWM
+# Enable / Disable HATs
+enableServoHAT = 1
+enableMotorHAT = 1
+
+
+if enableMotorHAT:
+    from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
+    mh = Adafruit_MotorHAT(addr=0x60)
+
+if enableServoHAT:
+    from Adafruit_PWM_Servo_Driver import PWM
+    pwm = PWM(0x40)
+    pwm.setPWMFreq(60)
+
 import socket as soc
 import sys
 import re
@@ -14,9 +26,6 @@ import time
 import json
 import atexit
 
-# Servo config
-pwm = PWM(0x40)
-pwm.setPWMFreq(60)
 servoMin = 150  # Min pulse length out of 4096
 servoMax = 600  # Max pulse length out of 4096
 totalServos = 15
@@ -34,15 +43,11 @@ def turnOffMotors():
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
     socket.close()
 
-
 atexit.register(turnOffMotors)
-
-mh = Adafruit_MotorHAT(addr=0x60)
 
 socket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
 address = ('localhost', 5432)  # Create an address tuple
 socket.bind(address)
-
 
 # recommended for auto-disabling motors on shutdown!
 def turnOffMotors():
@@ -51,13 +56,7 @@ def turnOffMotors():
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
 
-
 atexit.register(turnOffMotors)
-
-motorA = mh.getMotor(1)
-motorB = mh.getMotor(3)
-motorA.run(Adafruit_MotorHAT.FORWARD)
-motorB.run(Adafruit_MotorHAT.FORWARD)
 
 def setServoPulse(channel, pulse):
     pulseLength = 1000000  # 1,000,000 us per second
@@ -69,7 +68,6 @@ def setServoPulse(channel, pulse):
     pulse /= pulseLength
     pwm.setPWM(channel, 0, pulse)
 
-
 def setServo(channel, value):
     value = float(value)
     value = value / 100 * 450
@@ -78,6 +76,11 @@ def setServo(channel, value):
     value = int(value)
     pwm.setPWM(channel, 0, value)
 
+if enableMotorHAT:
+    motorA = mh.getMotor(1)
+    motorB = mh.getMotor(3)
+    motorA.run(Adafruit_MotorHAT.FORWARD)
+    motorB.run(Adafruit_MotorHAT.FORWARD)
 
 while 1:  # This will loop forever
     socket.listen(1)
@@ -97,52 +100,54 @@ while 1:  # This will loop forever
                 continue
 
             ### servos ###
-            try:
-                for i in xrange(0, totalServos):
-                    a = int(parsed_json['servo'+str(i)])
-                    exec("servo%s = %d" % (i, a))
-                for i in xrange(0, totalServos):
-                    exec("setServo(%s,servo%s)" % (i, i))
-            except:
-                pass
+            if enableServoHAT:
+                try:
+                    for i in xrange(0, totalServos):
+                        a = int(parsed_json['servo'+str(i)])
+                        exec("servo%s = %d" % (i, a))
+                    for i in xrange(0, totalServos):
+                        exec("setServo(%s,servo%s)" % (i, i))
+                except:
+                    pass
 
             ### motors ###
-            motorLeft = parsed_json['leftMotor']
-            motorRight = parsed_json['rightMotor']
-            direction = parsed_json['direction']
+            if enableMotorHAT:
+                motorLeft = parsed_json['leftMotor']
+                motorRight = parsed_json['rightMotor']
+                direction = parsed_json['direction']
 
-            if debug:
-                print("motorLeft", motorLeft)
-                print("motorRight", motorRight)
-                print("direction", direction)
+                if debug:
+                    print("motorLeft", motorLeft)
+                    print("motorRight", motorRight)
+                    print("direction", direction)
 
-            if direction == 'fwd':
-                directionLeft = 1
-                directionRight = 1
-                motorB.run(Adafruit_MotorHAT.FORWARD)
-                motorA.run(Adafruit_MotorHAT.FORWARD)
-            elif direction == 'back':
-                directionLeft = 0
-                directionRight = 0
-                motorB.run(Adafruit_MotorHAT.BACKWARD)
-                motorA.run(Adafruit_MotorHAT.BACKWARD)
-            elif direction == 'sharpLeft':
-                directionLeft = 1
-                directionRight = 0
-                motorB.run(Adafruit_MotorHAT.FORWARD)
-                motorA.run(Adafruit_MotorHAT.BACKWARD)
-            elif direction == 'sharpRight':
-                directionLeft = 0
-                directionRight = 1
-                motorB.run(Adafruit_MotorHAT.BACKWARD)
-                motorA.run(Adafruit_MotorHAT.FORWARD)
-            elif direction == 'none':
-                continue
+                if direction == 'fwd':
+                    directionLeft = 1
+                    directionRight = 1
+                    motorB.run(Adafruit_MotorHAT.FORWARD)
+                    motorA.run(Adafruit_MotorHAT.FORWARD)
+                elif direction == 'back':
+                    directionLeft = 0
+                    directionRight = 0
+                    motorB.run(Adafruit_MotorHAT.BACKWARD)
+                    motorA.run(Adafruit_MotorHAT.BACKWARD)
+                elif direction == 'sharpLeft':
+                    directionLeft = 1
+                    directionRight = 0
+                    motorB.run(Adafruit_MotorHAT.FORWARD)
+                    motorA.run(Adafruit_MotorHAT.BACKWARD)
+                elif direction == 'sharpRight':
+                    directionLeft = 0
+                    directionRight = 1
+                    motorB.run(Adafruit_MotorHAT.BACKWARD)
+                    motorA.run(Adafruit_MotorHAT.FORWARD)
+                elif direction == 'none':
+                    continue
 
-            # print "Running ", motorLeft + " " + motorLeft
+                # print "Running ", motorLeft + " " + motorLeft
 
-            motorA.setSpeed(int(motorRight))
-            motorB.setSpeed(int(motorLeft))
+                motorA.setSpeed(int(motorRight))
+                motorB.setSpeed(int(motorLeft))
 
         ### enable the following lines if you want to send data back to client
         # data = "Echo: " + data

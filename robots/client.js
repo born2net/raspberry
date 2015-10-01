@@ -14,12 +14,15 @@ noderob.initJoystick(function(joystick){
     var self = noderob;
 
     // override specific behavior
-    joystick.on("button:crossup:press", function () {
-        self.m_servo2 = 25;
-    });
+    joystick.removeAllListeners("button:crossup:press");
+    joystick.removeAllListeners("button:crossup:press:up");
 
+    joystick.on("button:crossup:press", function () {
+        self.setValue('m_servo2',45);
+    });
     joystick.on("button:crossup:press:up", function () {
-        self.m_servo2 = 0;
+        self.setValue('m_servo2',0);
+        //console.log(self.getValue('m_servo2'));
     });
 });
 
