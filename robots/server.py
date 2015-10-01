@@ -52,17 +52,13 @@ socket = soc.socket(soc.AF_INET, soc.SOCK_STREAM)
 address = ('localhost', 5432)  # Create an address tuple
 socket.bind(address)
 
-
-# recommended for auto-disabling motors on shutdown!
 def turnOffMotors():
     mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
 
-
 atexit.register(turnOffMotors)
-
 
 def setServoPulse(channel, pulse):
     pulseLength = 1000000  # 1,000,000 us per second
@@ -74,7 +70,6 @@ def setServoPulse(channel, pulse):
     pulse /= pulseLength
     pwm.setPWM(channel, 0, pulse)
 
-
 def setServo(channel, value):
     value = float(value)
     value = value / 100 * 450
@@ -83,14 +78,13 @@ def setServo(channel, value):
     value = int(value)
     pwm.setPWM(channel, 0, value)
 
-
 if enableMotorHAT:
     motorA = mh.getMotor(1)
     motorB = mh.getMotor(3)
     motorA.run(Adafruit_MotorHAT.FORWARD)
     motorB.run(Adafruit_MotorHAT.FORWARD)
 
-while 1:  # This will loop forever
+while 1:
     socket.listen(1)
     print "Robot has server is listening"
     connection, addrress = socket.accept()  # The program blocks here
