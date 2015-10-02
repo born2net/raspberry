@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: Adafruit-CharLCD
+Version: 1.0.0
+Summary: Library to drive character LCD display and plate.
+Home-page: https://github.com/adafruit/Adafruit_Python_CharLCD/
+Author: Tony DiCola
+Author-email: tdicola@adafruit.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN

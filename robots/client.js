@@ -1,6 +1,5 @@
 #!/usr/local/bin/node
 var exec = require('child_process').exec;
-
 var nodeRob = require('noderob').create({
     debug: 0,
     serverConnect: 1,
@@ -13,8 +12,6 @@ nodeRob.on('ABC', function (e) {
     console.log('GOTAA ' + e);
 });
 
-nodeRob.logSomething('firing');
-
 nodeRob.initSocket();
 nodeRob.initServos();
 nodeRob.initJoystick(function (joystick) {
@@ -25,7 +22,7 @@ nodeRob.initJoystick(function (joystick) {
     joystick.removeAllListeners("button:crossup:press:up");
 
     joystick.on("button:crossup:press", function () {
-        self.setValue('m_servo2', 45);
+        self.setValue('m_servo2', 25);
     });
     joystick.on("button:crossup:press:up", function () {
         self.setValue('m_servo2', 0);
