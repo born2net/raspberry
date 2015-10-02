@@ -12,7 +12,7 @@ import atexit
 
 totalArgs = len(sys.argv)
 if totalArgs < 3:
-    print "Usage: server.py [0/1 servo] [0/1 motors] [ 0/1 lcd]"
+    print "Usage: server.py [0/1 servo-hat] [0/1 motors-hat] [ 0/1 lcd-hat]"
     sys.exit()
 
 # Enable / Disable HATs
