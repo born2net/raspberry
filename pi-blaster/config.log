@@ -33,6 +33,8 @@ PATH: /usr/sbin
 PATH: /usr/bin
 PATH: /sbin
 PATH: /bin
+PATH: /usr/bin/nwjs-v0.12.0-linux-arm/
+PATH: /usr/bin/nw_iojs-v0.12.0-linux-arm
 
 
 ## ----------- ##

@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 var gpio = require('rpi-gpio');
 var pinA = 18;
-var pinB = 23;
+var pinB = 25;
 
 gpio.setMode(gpio.MODE_BCM); // Sean use BCM so you can reffer to pins on the green board
 

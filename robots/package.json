@@ -5,7 +5,9 @@
   "main": "client.js",
   "dependencies": {
     "colors": "^1.1.2",
-    "joystick-logitech-f710": ">0.1"
+    "joystick-logitech-f710": ">0.1",
+    "onoff": "^1.0.2",
+    "pi-blaster.js": "^0.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

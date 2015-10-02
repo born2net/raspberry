@@ -1,4 +1,5 @@
 #!/usr/local/bin/node
+
 var exec = require('child_process').exec;
 var nodeRob = require('noderob').create({
     debug: 0,
@@ -6,10 +7,6 @@ var nodeRob = require('noderob').create({
     host: 'localhost',
     port: 5432,
     pollInterval: 25
-});
-
-nodeRob.on('ABC', function (e) {
-    console.log('GOTAA ' + e);
 });
 
 nodeRob.initSocket();
@@ -46,6 +43,9 @@ nodeRob.on('LCD:select', function (e) {
     nodeRob.log('s', 0);
     var child = exec('shutdown now');
 });
+
+nodeRob.testGPIO();
+nodeRob.testServoBlaster();
 
 var a = 1;
 setInterval(function () {

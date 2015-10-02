@@ -2,7 +2,7 @@
 var gpio = require('rpi-gpio');
 gpio.setMode(gpio.MODE_BCM); // Sean use BCM so you can reffer to pins on the green board
 
-var pin = 18;
+var pin = 12;
 
 function write() {
     gpio.write(pin, true, function(err) {
@@ -17,4 +17,4 @@ function write() {
     });
 }
 
-gpio.setup(pin, gpio.DIR_OUT, write);
+gpio.setup(pin, gpio.DIR_IN, write);
