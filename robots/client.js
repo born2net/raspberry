@@ -46,13 +46,8 @@ nodeRob.on('LCD:select', function (e) {
 
 nodeRob.testGPIO();
 nodeRob.testServoBlaster();
+nodeRob.testLCD();
 
-var a = 1;
-setInterval(function () {
-    nodeRob.setLCD(Math.random() + '\n' + a++, 'magenta');
-}, 1000);
-nodeRob.start();
-nodeRob.log('Starting NodeRob...', 1, 'yellow');
 
 
 
