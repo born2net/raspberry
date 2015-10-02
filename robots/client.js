@@ -1,5 +1,5 @@
 #!/usr/local/bin/node
-
+var exec = require('child_process').exec;
 var noderob = require('noderob').createNodeRob({
     debug: 0,
     serverConnect: 1,
@@ -29,19 +29,20 @@ noderob.initJoystick(function (joystick) {
 });
 
 commBroker.listen('LCD:right',function(e){
-    noderob.log('r',0)
+    noderob.log('r',0);
 });
 commBroker.listen('LCD:left',function(e){
-    noderob.log('l',0)
+    noderob.log('l',0);
 });
 commBroker.listen('LCD:up',function(e){
-    noderob.log('u',0)
+    noderob.log('u',0);
 });
 commBroker.listen('LCD:down',function(e){
-    noderob.log('d',0)
+    noderob.log('d',0);
 });
 commBroker.listen('LCD:select',function(e){
-    noderob.log('s',0)
+    noderob.log('s',0);
+    var child = exec('shutdown now');
 });
 
 
