@@ -100,7 +100,7 @@ while 1:
                     print("motorLeft", motorLeft)
                     print("motorRight", motorRight)
 
-                setServo(13,motorLeft)
+                setServo(15,motorLeft)
                 setServo(14,motorRight)
 
                     # print "Running ", motorLeft + " " + motorLeft
