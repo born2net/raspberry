@@ -2,7 +2,7 @@
 
 var exec = require('child_process').exec;
 var nodeRob = require('noderob').create({
-    debug: 0,
+    debug: 1,
     serverConnect: 1,
     host: 'localhost',
     port: 5432,
@@ -27,26 +27,19 @@ nodeRob.initJoystick(function (joystick) {
     });
 });
 
-nodeRob.on('LCD:right', function (e) {
-    nodeRob.log('r', 0);
-});
-nodeRob.on('LCD:left', function (e) {
-    nodeRob.log('l', 0);
-});
-nodeRob.on('LCD:up', function (e) {
-    nodeRob.log('u', 0);
-});
-nodeRob.on('LCD:down', function (e) {
-    nodeRob.log('d', 0);
-});
-nodeRob.on('LCD:select', function (e) {
-    nodeRob.log('s', 0);
-    var child = exec('shutdown now');
+var c = 0;
+nodeRob.on('LCD:BUTTON:DOWN', function (e) {
+    nodeRob.setLCD('Hello', 'num ' + c++, 'YELLOW');
 });
 
+
+
+nodeRob.initLCD();
+nodeRob.initLCDButtons();
 nodeRob.testGPIO();
 nodeRob.testServoBlaster();
 nodeRob.testLCD();
+nodeRob.start();
 
 
 

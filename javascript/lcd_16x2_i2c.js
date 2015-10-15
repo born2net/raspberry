@@ -1,7 +1,6 @@
 #!/usr/local/bin/node
 
 var exec = require('child_process').exec;
-
 var LCDPLATE, lcd;
 LCDPLATE = require('adafruit-i2c-lcd').plate;
 lcd = new LCDPLATE('/dev/i2c-1', 0x20);
