@@ -34,9 +34,9 @@ nodeRob.on('LCD:BUTTON:DOWN', function (e) {
 
 
 
-//nodeRob.initLCD();
-//nodeRob.initLCDButtons();
-//nodeRob.testLCD();
+nodeRob.initLCD();
+nodeRob.initLCDButtons();
+nodeRob.testLCD();
 nodeRob.testGPIO();
 nodeRob.testServoBlaster();
 nodeRob.start();
